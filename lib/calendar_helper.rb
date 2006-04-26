@@ -14,7 +14,7 @@ module CalendarHelper
   # The following are optional, available for customizing the default behaviour:
   #   :table_class       => "calendar"        # The class for the <table> tag.
   #   :month_name_class  => "monthName"       # The class for the name of the month, at the top of the table.
-  #   :other_month_class => "otherMonthClass" # Not implemented yet.
+  #   :other_month_class => "otherMonth" # Not implemented yet.
   #   :day_name_class    => "dayName"         # The class is for the names of the weekdays, at the top.
   #   :day_class         => "day"             # The class for the individual day number cells.
   #                                             This may or may not be used if you specify a block (see below).
@@ -43,6 +43,11 @@ module CalendarHelper
   #     else                                      # "normalDay". You can also use this highlight today differently
   #       [d.mday, {:class => "normalDay"}]       # from the rest of the days, etc.
   #   end
+  #
+  # An additional 'weekend' class is applied to weekend days. 
+  #
+  # For consistency with the themes provided in the calendar_styles generator, use the "specialDay" as the CSS class for marked days.
+  # 
   def calendar(options = {}, &block)
     raise(ArgumentError, "No year given")  unless options.has_key?(:year)
     raise(ArgumentError, "No month given") unless options.has_key?(:month)
@@ -85,22 +90,22 @@ EOF
 	<tbody>
 		<tr>"
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
-      cal << %(			<td class='#{options[:other_month_class]})
-      cal << " weekend" if weekend?(d)
+      cal << %(			<td class="#{options[:other_month_class]})
+      cal << " weekendDay" if weekend?(d)
       cal << %(">#{d.day}</td>)
     end unless first.wday == first_weekday
     first.upto(last) do |cur|
       cell_text, cell_attrs = block.call(cur)
       cell_text  ||= cur.mday
       cell_attrs ||= {:class => options[:day_class]}
-      cell_attrs[:class] += " weekend" if [0, 6].include?(cur.wday) 
+      cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday) 
       cell_attrs = cell_attrs.map {|k, v| %(#{k}="#{v}") }.join(" ")
       cal << "			<td #{cell_attrs}>#{cell_text}</td>"
       cal << "		</tr>\n		<tr>" if cur.wday == last_weekday
     end
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
       cal << %(			<td class="#{options[:other_month_class]})
-      cal << " weekend" if weekend?(d)
+      cal << " weekendDay" if weekend?(d)
       cal << %(">#{d.day}</td>)
     end unless last.wday == last_weekday
     cal << "		</tr>\n	</tbody>\n</table>"
