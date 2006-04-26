@@ -12,6 +12,7 @@ class CalendarHelperTest < Test::Unit::TestCase
 
 
   def test_required_fields
+    # Year and month are required
     assert_raises(ArgumentError) {
       calendar
     }
@@ -23,12 +24,22 @@ class CalendarHelperTest < Test::Unit::TestCase
     }    
   end
 
+  def test_default_css_classes
+    # :other_month_class is not implemented yet
+    { :table_class => "calendar", 
+      :month_name_class => "monthName", 
+      :day_name_class => "dayName", 
+      :day_class => "day" }.each do |key, value|
+      assert_correct_css_class_for_default value
+    end
+  end
 
-  def test_css_classes
-    # Sending these fields should change the CSS class applied in the output
+
+  def test_custom_css_classes
+    # Uses the key name as the CSS class name
     # :other_month_class is not implemented yet
     [:table_class, :month_name_class, :day_name_class, :day_class].each do |key|
-      assert_css_class_for_key key.to_s, key
+      assert_correct_css_class_for_key key.to_s, key
     end
   end
 
@@ -53,10 +64,13 @@ class CalendarHelperTest < Test::Unit::TestCase
 private
 
 
-  def assert_css_class_for_key(css_class, key)
+  def assert_correct_css_class_for_key(css_class, key)
     assert_match %r{class="#{css_class}"}, calendar_with_defaults(key => css_class)
   end
 
+  def assert_correct_css_class_for_default(css_class)
+    assert_match %r{class="#{css_class}"}, calendar_with_defaults
+  end
 
   def calendar_with_defaults(options={})
     options = { :year => 2006, :month => 8 }.merge options

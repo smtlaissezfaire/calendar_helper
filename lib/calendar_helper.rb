@@ -85,9 +85,9 @@ EOF
 	<tbody>
 		<tr>"
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
-      cal << "			<td class='#{options[:other_month_class]}"
+      cal << %(			<td class='#{options[:other_month_class]})
       cal << " weekend" if weekend?(d)
-      cal << "'>#{d.day}</td>"
+      cal << %(">#{d.day}</td>)
     end unless first.wday == first_weekday
     first.upto(last) do |cur|
       cell_text, cell_attrs = block.call(cur)
@@ -99,8 +99,8 @@ EOF
       cal << "		</tr>\n		<tr>" if cur.wday == last_weekday
     end
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
-      cal << %(			<td class="#{options[:other_month_class]} )
-      cal << "weekend" if weekend?(d)
+      cal << %(			<td class="#{options[:other_month_class]})
+      cal << " weekend" if weekend?(d)
       cal << %(">#{d.day}</td>)
     end unless last.wday == last_weekday
     cal << "		</tr>\n	</tbody>\n</table>"
