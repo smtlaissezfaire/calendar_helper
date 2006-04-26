@@ -1,7 +1,7 @@
 CalendarHelper
 ==============
 
-A simple helper for creating an HTML calendar.
+A simple helper for creating an HTML calendar. The "calendar" method will be automatically available to your view templates.
 
 There is also a Rails generator that copies some stylesheets for use alone or alongside existing stylesheets.
 
