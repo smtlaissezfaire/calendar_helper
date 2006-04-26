@@ -46,7 +46,7 @@ module CalendarHelper
   #
   # An additional 'weekend' class is applied to weekend days. 
   #
-  # For consistency with the themes provided in the calendar_styles generator, use the "specialDay" as the CSS class for marked days.
+  # For consistency with the themes provided in the calendar_styles generator, use "specialDay" as the CSS class for marked days.
   # 
   def calendar(options = {}, &block)
     raise(ArgumentError, "No year given")  unless options.has_key?(:year)
