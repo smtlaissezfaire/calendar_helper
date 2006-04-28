@@ -21,6 +21,7 @@ module CalendarHelper
   #   :abbrev            => (0..2)            # This option specifies how the day names should be abbreviated.
   #                                             Use (0..2) for the first three letters, (0..0) for the first, and
   #                                             (0..-1) for the entire name.
+  #   :first_day_of_week => 0                 # Renders calendar starting on Sunday. Use 1 for Monday, and so on.
   # 
   # For more customization, you can pass a code block to this method, that will get one argument, a Date object,
   # and return a values for the individual table cells. The block can return an array, [cell_text, cell_attrs],
@@ -76,21 +77,12 @@ module CalendarHelper
       day_names.push(day_names.shift)
     end
 
-    cal = <<EOF
-<table class="#{options[:table_class]}" border="0" cellspacing="0" cellpadding="0">
-	<thead>
-		<tr class="#{options[:month_name_class]}">
-			<th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th>
-		</tr>
-		<tr class="#{options[:day_name_class]}">
-EOF
-    day_names.each {|d| cal << "			<th>#{d[options[:abbrev]]}</th>"}
-    cal << "		</tr>
-	</thead>
-	<tbody>
-		<tr>"
+    cal = %(<table class="#{options[:table_class]}" border="0" cellspacing="0" cellpadding="0">) 
+    cal << %(<thead><tr class="#{options[:month_name_class]}"><th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th></tr><tr class="#{options[:day_name_class]}">)
+    day_names.each {|d| cal << "<th>#{d[options[:abbrev]]}</th>"}
+    cal << "</tr></thead><tbody><tr>"
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
-      cal << %(			<td class="#{options[:other_month_class]})
+      cal << %(<td class="#{options[:other_month_class]})
       cal << " weekendDay" if weekend?(d)
       cal << %(">#{d.day}</td>)
     end unless first.wday == first_weekday
@@ -100,15 +92,15 @@ EOF
       cell_attrs ||= {:class => options[:day_class]}
       cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday) 
       cell_attrs = cell_attrs.map {|k, v| %(#{k}="#{v}") }.join(" ")
-      cal << "			<td #{cell_attrs}>#{cell_text}</td>"
-      cal << "		</tr>\n		<tr>" if cur.wday == last_weekday
+      cal << "<td #{cell_attrs}>#{cell_text}</td>"
+      cal << "</tr><tr>" if cur.wday == last_weekday
     end
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
-      cal << %(			<td class="#{options[:other_month_class]})
+      cal << %(<td class="#{options[:other_month_class]})
       cal << " weekendDay" if weekend?(d)
       cal << %(">#{d.day}</td>)
     end unless last.wday == last_weekday
-    cal << "		</tr>\n	</tbody>\n</table>"
+    cal << "</tr></tbody></table>"
   end
   
   private

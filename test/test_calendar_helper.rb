@@ -61,6 +61,11 @@ class CalendarHelperTest < Test::Unit::TestCase
   end
 
 
+  def test_first_day_of_week
+    assert_match %r{<tr class="dayName">\s*<th>Sun}, calendar_with_defaults
+    assert_match %r{<tr class="dayName">\s*<th>Mon}, calendar_with_defaults(:first_day_of_week => 1)
+  end
+
 private
 
 
