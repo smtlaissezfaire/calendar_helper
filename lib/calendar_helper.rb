@@ -43,6 +43,7 @@ module CalendarHelper
   #       [d.mday, {:class => "specialDay"}]      # "specialDay", and gives the rest of the days another CSS class,
   #     else                                      # "normalDay". You can also use this highlight today differently
   #       [d.mday, {:class => "normalDay"}]       # from the rest of the days, etc.
+  #     end
   #   end
   #
   # An additional 'weekend' class is applied to weekend days. 
