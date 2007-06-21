@@ -3,10 +3,10 @@ MIT-LICENSE
 Manifest.txt
 README.txt
 Rakefile
-lib/calendar_styles_generator.rb
-lib/templates/blue/style.css
-lib/templates/grey/style.css
-lib/templates/red/style.css
+generators/calendar_styles/calendar_styles_generator.rb
+generators/calendar_styles/templates/blue/style.css
+generators/calendar_styles/templates/grey/style.css
+generators/calendar_styles/templates/red/style.css
 init.rb
 lib/calendar_helper.rb
 test/stylesheet_tester.html
