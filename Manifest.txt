@@ -9,5 +9,4 @@ generators/calendar_styles/templates/grey/style.css
 generators/calendar_styles/templates/red/style.css
 init.rb
 lib/calendar_helper.rb
-test/stylesheet_tester.html
 test/test_calendar_helper.rb
