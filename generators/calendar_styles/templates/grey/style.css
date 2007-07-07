@@ -65,6 +65,10 @@
 .weekendDay {
   background-color: #787888;
 }
+.today {
+	background-color: white;
+	color: black;
+}
 
 Colors: 
   dk: 787888

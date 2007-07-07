@@ -25,7 +25,16 @@ module CalendarHelper
   #                                             Use (0..2) for the first three letters, (0..0) for the first, and
   #                                             (0..-1) for the entire name.
   #   :first_day_of_week => 0                 # Renders calendar starting on Sunday. Use 1 for Monday, and so on.
-  # 
+  #   :accessible        => true              # Turns on accessibility mode. This suffixes dates within the
+  #                                           # calendar that are outside the range defined in the <caption> with 
+  #                                           # <span class="hidden"> MonthName</span>
+  #                                           # Defaults to false.
+  #                                           # You'll need to define an appropriate style in order to make this disappear. 
+  #                                           # Choose your own method of hiding content appropriately.
+  #
+  #   :show_today        => false             # Highlights today on the calendar using the CSS class 'today'. 
+  #                                           # Defaults to true.
+  #
   # For more customization, you can pass a code block to this method, that will get one argument, a Date object,
   # and return a values for the individual table cells. The block can return an array, [cell_text, cell_attrs],
   # cell_text being the text that is displayed and cell_attrs a hash containing the attributes for the <td> tag
@@ -66,7 +75,9 @@ module CalendarHelper
       :day_name_class => 'dayName',
       :day_class => 'day',
       :abbrev => (0..2),
-      :first_day_of_week => 0
+      :first_day_of_week => 0,
+      :accessible => false,
+      :show_today => true
     }
     options = defaults.merge options
 
@@ -82,19 +93,30 @@ module CalendarHelper
     end
 
     cal = %(<table class="#{options[:table_class]}" border="0" cellspacing="0" cellpadding="0">) 
-    cal << %(<thead><tr class="#{options[:month_name_class]}"><th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th></tr><tr class="#{options[:day_name_class]}">)
-    day_names.each {|d| cal << "<th>#{d[options[:abbrev]]}</th>"}
+    cal << %(<caption class="#{options[:month_name_class]}"></caption><thead><th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th></tr><tr class="#{options[:day_name_class]}">)
+    day_names.each do |d|
+      unless d[options[:abbrev]].eql? d
+        cal << "<th scope='col'><abbr title='#{d}'>#{d[options[:abbrev]]}</abbr></th>"
+      else
+        cal << "<th scope='col'>#{d[options[:abbrev]]}</th>"
+      end
+    end
     cal << "</tr></thead><tbody><tr>"
     beginning_of_week(first, first_weekday).upto(first - 1) do |d|
       cal << %(<td class="#{options[:other_month_class]})
       cal << " weekendDay" if weekend?(d)
-      cal << %(">#{d.day}</td>)
+      if options[:accessible]
+        cal << %(">#{d.day}<span class="hidden"> #{Date::MONTHNAMES[d.month]}</span></td>)
+      else
+        cal << %(">#{d.day}</td>)
+      end
     end unless first.wday == first_weekday
     first.upto(last) do |cur|
       cell_text, cell_attrs = block.call(cur)
       cell_text  ||= cur.mday
       cell_attrs ||= {:class => options[:day_class]}
       cell_attrs[:class] += " weekendDay" if [0, 6].include?(cur.wday) 
+      cell_attrs[:class] += " today" if (cur == Date.today) and options[:show_today]  
       cell_attrs = cell_attrs.map {|k, v| %(#{k}="#{v}") }.join(" ")
       cal << "<td #{cell_attrs}>#{cell_text}</td>"
       cal << "</tr><tr>" if cur.wday == last_weekday
@@ -102,7 +124,11 @@ module CalendarHelper
     (last + 1).upto(beginning_of_week(last + 7, first_weekday) - 1)  do |d|
       cal << %(<td class="#{options[:other_month_class]})
       cal << " weekendDay" if weekend?(d)
-      cal << %(">#{d.day}</td>)
+      if options[:accessible]
+        cal << %(">#{d.day}<span class='hidden'> #{Date::MONTHNAMES[d.mon]}</span></td>)
+      else
+        cal << %(">#{d.day}</td>)        
+      end
     end unless last.wday == last_weekday
     cal << "</tr></tbody></table>"
   end

@@ -1,15 +1,20 @@
 require 'test/unit'
+require 'fileutils'
 require File.expand_path(File.dirname(__FILE__) + "/../lib/calendar_helper")
 
 class CalendarHelperTest < Test::Unit::TestCase
 
   include CalendarHelper
-  
-  
+
+  def test_with_output
+    output = "<h2>Past Month</h2>" + calendar_with_defaults
+    output << "<h2>Current Month</h2>" + calendar_for_this_month
+    write_sample "sample.html", output
+  end
+
   def test_simple
     assert_match %r{August}, calendar_with_defaults
   end
-
 
   def test_required_fields
     # Year and month are required
@@ -21,19 +26,19 @@ class CalendarHelperTest < Test::Unit::TestCase
     }
     assert_raises(ArgumentError) {
       calendar :month => 1
-    }    
+    }
   end
 
   def test_default_css_classes
     # :other_month_class is not implemented yet
-    { :table_class => "calendar", 
-      :month_name_class => "monthName", 
-      :day_name_class => "dayName", 
-      :day_class => "day" }.each do |key, value|
+    { :table_class => "calendar",
+      :month_name_class => "monthName",
+      :day_name_class => "dayName",
+      :day_class => "day"
+    }.each do |key, value|
       assert_correct_css_class_for_default value
     end
   end
-
 
   def test_custom_css_classes
     # Uses the key name as the CSS class name
@@ -43,13 +48,11 @@ class CalendarHelperTest < Test::Unit::TestCase
     end
   end
 
-  
   def test_abbrev
     assert_match %r{>Mon<}, calendar_with_defaults(:abbrev => (0..2))
     assert_match %r{>M<}, calendar_with_defaults(:abbrev => (0..0))
     assert_match %r{>Monday<}, calendar_with_defaults(:abbrev => (0..-1))
   end
-
 
   def test_block
     # Even days are special
@@ -60,14 +63,24 @@ class CalendarHelperTest < Test::Unit::TestCase
     }
   end
 
-
   def test_first_day_of_week
-    assert_match %r{<tr class="dayName">\s*<th>Sun}, calendar_with_defaults
-    assert_match %r{<tr class="dayName">\s*<th>Mon}, calendar_with_defaults(:first_day_of_week => 1)
+    assert_match %r{<tr class="dayName">\s*<th scope='col'><abbr title='Sunday'>Sun}, calendar_with_defaults
+    # testing that if the abbrev and contracted version are the same, there should be no abbreviation.
+    assert_match %r{<tr class="dayName">\s*<th scope='col'>Sunday}, calendar_with_defaults(:abbrev => (0..8))
+    assert_match %r{<tr class="dayName">\s*<th scope='col'><abbr title='Monday'>Mon}, calendar_with_defaults(:first_day_of_week => 1)
   end
 
-private
+  def test_today_is_in_calendar
+    todays_day = Date.today.day
+    assert_match %r{class="day.+today">#{todays_day}<}, calendar_for_this_month
+  end
 
+  def test_should_not_show_today
+    todays_day = Date.today.day
+    assert_no_match %r{today}, calendar_for_this_month(:show_today => false)
+  end
+
+  private
 
   def assert_correct_css_class_for_key(css_class, key)
     assert_match %r{class="#{css_class}"}, calendar_with_defaults(key => css_class)
@@ -80,6 +93,20 @@ private
   def calendar_with_defaults(options={})
     options = { :year => 2006, :month => 8 }.merge options
     calendar options
+  end
+
+  def calendar_for_this_month(options={})
+    options = { :year => Time.now.year, :month => Time.now.month}.merge options
+    calendar options
+  end
+
+  def write_sample(filename, content)
+    FileUtils.mkdir_p "test/output"
+    File.open("test/output/#{filename}", 'w') do |f|
+      f.write %(<html><head><title>Stylesheet Tester</title><link href="../../generators/calendar_styles/templates/grey/style.css" media="screen" rel="Stylesheet" type="text/css" /></head><body>)
+      f.write content
+      f.write %(</body></html>)
+    end
   end
 
 end
