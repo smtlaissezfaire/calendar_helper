@@ -3,7 +3,7 @@ require 'date'
 # CalendarHelper allows you to draw a databound calendar with fine-grained CSS formatting
 module CalendarHelper
 
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
 
   # Returns an HTML calendar. In its simplest form, this method generates a plain
   # calendar (which can then be customized using CSS) for a given month and year.
@@ -93,7 +93,7 @@ module CalendarHelper
     end
 
     cal = %(<table class="#{options[:table_class]}" border="0" cellspacing="0" cellpadding="0">) 
-    cal << %(<caption class="#{options[:month_name_class]}"></caption><thead><th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th></tr><tr class="#{options[:day_name_class]}">)
+    cal << %(<caption class="#{options[:month_name_class]}"></caption><thead><tr><th colspan="7">#{Date::MONTHNAMES[options[:month]]}</th></tr><tr class="#{options[:day_name_class]}">)
     day_names.each do |d|
       unless d[options[:abbrev]].eql? d
         cal << "<th scope='col'><abbr title='#{d}'>#{d[options[:abbrev]]}</abbr></th>"

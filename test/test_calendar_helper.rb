@@ -1,10 +1,20 @@
+require 'rubygems'
 require 'test/unit'
 require 'fileutils'
 require File.expand_path(File.dirname(__FILE__) + "/../lib/calendar_helper")
 
+require 'flexmock/test_unit'
+
+# require 'action_controller'
+# require 'action_controller/assertions'
+# require 'active_support/inflector'
+
 class CalendarHelperTest < Test::Unit::TestCase
 
+  # include Inflector
+  # include ActionController::Assertions::SelectorAssertions
   include CalendarHelper
+  
 
   def test_with_output
     output = "<h2>Past Month</h2>" + calendar_with_defaults
@@ -80,6 +90,14 @@ class CalendarHelperTest < Test::Unit::TestCase
     assert_no_match %r{today}, calendar_for_this_month(:show_today => false)
   end
 
+  # HACK Tried to use assert_select, but it's not made for free-standing
+  #      HTML parsing.
+  def test_should_have_two_tr_tags_in_the_thead
+    # TODO Use a validating service to make sure the rendered HTML is valid
+    html = calendar_with_defaults
+    assert_match %r{<thead><tr>.*</tr><tr.*</tr></thead>}, html
+  end
+
   private
 
   def assert_correct_css_class_for_key(css_class, key)
@@ -103,7 +121,7 @@ class CalendarHelperTest < Test::Unit::TestCase
   def write_sample(filename, content)
     FileUtils.mkdir_p "test/output"
     File.open("test/output/#{filename}", 'w') do |f|
-      f.write %(<html><head><title>Stylesheet Tester</title><link href="../../generators/calendar_styles/templates/grey/style.css" media="screen" rel="Stylesheet" type="text/css" /></head><body>)
+      f.write %(<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><head><title>Stylesheet Tester</title><link href="../../generators/calendar_styles/templates/grey/style.css" media="screen" rel="Stylesheet" type="text/css" /></head><body>)
       f.write content
       f.write %(</body></html>)
     end
